@@ -2,19 +2,20 @@ package controllers.api
 
 import java.util.UUID
 
+import modelinterfaces.Player
 import models.GameModel
+import org.apache.commons.lang3.ArrayUtils
 import play.api.libs.json.Json.JsValueWrapper
-import play.api.mvc.{BodyParsers, Action, Result}
+import play.api.mvc._
 
 import scala.collection.mutable
 
 import play.api._
-import play.api.mvc._
 import play.api.i18n._
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.validation.Constraints._
-import play.api.libs.json.{JsArray, JsValue, JsError, Json}
+import play.api.libs.json._
 import models._
 
 case class GameData(id: Option[String])
@@ -80,5 +81,42 @@ class Game extends Controller {
       )
 
       Ok(node)
+  }
+
+  private def gameFieldToJsonNode(gameName: String, gameModel: GameModel) = Action {
+    request =>
+
+        val gameField: Array[Array[Player]] = gameModel.controller.getCopyOfGameField.gameField.reverse
+        val sessionPlayer = request.session.get("player").getOrElse("")
+        val playerOnTurn = if (gameModel.playerOnTurn.hashCode.toString == sessionPlayer)
+          "you"
+        else "opponent"
+
+        val gameArrayNode: Seq[JsArray] =
+          for {
+            rows: Array[Player] <- gameField
+
+            rowsNode: JsArray =
+            (for {
+              p <- rows
+              player: JsValueWrapper = if (p != null) {
+                if (p eq gameModel.opponent) "opponent"
+                else "you"
+              }
+              else {
+                JsNull
+              }
+            } yield player).toSeq
+          } yield rowsNode
+
+      val node: JsValue = Json.obj(
+        "id" -> gameName,
+        "isWaitingForOpponent" -> gameModel.waitingForOpponent,
+        "gameStarted" -> gameModel.started,
+        "playerOnTurn" -> playerOnTurn,
+        "game_field" -> gameArrayNode
+      )
+
+        return node
   }
 }
