@@ -83,6 +83,20 @@ class Game extends Controller {
       Ok(node)
   }
 
+  def undo(gameName: String) = {
+    if (gamesMap.contains(gameName)) {
+      val node = Json.obj("undone" -> true)
+      val model = gamesMap.get(gameName).get
+
+      model.controller.undoLastMove
+
+      Ok(node)
+    } else {
+      BadRequest
+    }
+  }
+/*
+Evtl total unnötig, da wir kein Save und Load machen!
   private def gameFieldToJsonNode(gameName: String, gameModel: GameModel) = Action {
     request =>
 
@@ -118,5 +132,5 @@ class Game extends Controller {
       )
 
         return node
-  }
+  }*/
 }
