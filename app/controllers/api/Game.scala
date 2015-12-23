@@ -52,8 +52,7 @@ class Game extends Controller {
       val playerOnTurnJS: (String, JsValueWrapper) =
         if (playerOnTurn == sessionPlayer) {
           "playerOnTurn" -> "you"
-        }
-        else {
+        } else {
           "playerOnTurn" -> "opponent"
         }
 
@@ -65,6 +64,6 @@ class Game extends Controller {
           "game_field" -> JsArray())
       )
 
-      Ok(node).withSession(("player", Integer.toString(model.player.hashCode)))
+      Ok(node).withSession(("player", model.player.hashCode.toString))
   }
 }
