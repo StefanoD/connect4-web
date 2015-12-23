@@ -32,7 +32,7 @@ class Game extends Controller {
   }
 
   def newGameWithName(gameName: String) = {
-      newGame(gameName, new GameModel)
+    newGame(gameName, new GameModel)
   }
 
   def newGame(gameName: String, gameModel: GameModel) = Action(BodyParsers.parse.json) {
@@ -60,5 +60,25 @@ class Game extends Controller {
       )
 
       Ok(node).withSession(("player", model.player.hashCode.toString))
+  }
+
+  def dropCoin(gameName: String, column: Int) = Action {
+    request =>
+      val sessionPlayer = request.session.get("player").getOrElse("")
+
+      val dropped: Boolean = if (gamesMap.contains(gameName)) {
+        val model: GameModel = gamesMap.get(gameName).get
+        val hashcode = model.playerOnTurn.hashCode.toString
+
+        model.started && sessionPlayer == hashcode && model.controller.dropCoin(column)
+      } else {
+        false
+      }
+
+      val node: JsValue = Json.obj(
+        "dropped" -> dropped
+      )
+
+      Ok(node)
   }
 }
