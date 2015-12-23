@@ -1,5 +1,7 @@
 package controllers.api
 
+import java.util.UUID
+
 import models.GameModel
 import play.api.libs.json.Json.JsValueWrapper
 import play.api.mvc.{BodyParsers, Action, Result}
@@ -25,20 +27,13 @@ class Game extends Controller {
     )(GameData.apply)(GameData.unapply)
   )
 
-  def newGameWithName(gameName: String) = Action(BodyParsers.parse.json) {
-    request =>
-      val gameModel = new GameModel
-
-      gameForm.bindFromRequest().fold(
-        errors => {
-          BadRequest(Json.obj("status" -> "KO"))
-        },
-        game => {
-          newGame(gameName, gameModel)
-        }
-      )
+  def newGameWithoutName() = {
+    newGameWithName(UUID.randomUUID.toString)
   }
 
+  def newGameWithName(gameName: String) = {
+      newGame(gameName, new GameModel)
+  }
 
   def newGame(gameName: String, gameModel: GameModel) = Action(BodyParsers.parse.json) {
     request =>
