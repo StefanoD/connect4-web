@@ -6,8 +6,8 @@ import controller.GameController
 
 
 class GameModel() {
-  val player = new Connect4Player("You")
-  val opponent = new Connect4Computer("Computer", Connect4GameController.getCurrentInstance)
+  val controller = Connect4GameController.getNewInstance("You", "Computer")
+  val player, opponent = controller.getPlayers
 
   var waitingForOpponent = false
   var started = false
@@ -19,4 +19,6 @@ class GameModel() {
     }
     return false
   }
+
+  def playerOnTurn = controller.getPlayerOnTurn
 }
