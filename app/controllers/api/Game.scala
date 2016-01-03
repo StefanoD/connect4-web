@@ -20,8 +20,11 @@ import models._
 
 case class GameData(id: Option[String])
 
-class Game extends Controller {
+object Game {
   private val gamesMap = new mutable.HashMap[String, GameModel]()
+}
+
+class Game extends Controller {
   private val gameForm = Form(
     mapping(
       "id" -> optional(text)
@@ -38,9 +41,9 @@ class Game extends Controller {
 
   def newGame(gameName: String, gameModel: GameModel) = Action(BodyParsers.parse.json) {
     request =>
-      val model: GameModel = gamesMap.get(gameName).getOrElse(gameModel)
+      val model: GameModel = Game.gamesMap.get(gameName).getOrElse(gameModel)
 
-      gamesMap.put(gameName, model)
+      Game.gamesMap.put(gameName, model)
 
       val sessionPlayer = request.session.get("player").getOrElse("")
       val playerOnTurn = model.playerOnTurn.hashCode.toString
@@ -67,7 +70,7 @@ class Game extends Controller {
       val sessionPlayer = request.session.get("player").getOrElse("")
       val gameFields = JsArray(
         (for {
-          (gameName, gameModel) <- gamesMap
+          (gameName, gameModel) <- Game.gamesMap
           gameFieldJs = gameFieldToJsonNode(gameName, gameModel, sessionPlayer)
         } yield gameFieldJs).toSeq)
 
@@ -79,10 +82,10 @@ class Game extends Controller {
 
   def gameField(gameName: String) = Action {
     request =>
-      val model: GameModel = gamesMap.get(gameName).getOrElse(null)
+      val model: GameModel = Game.gamesMap.get(gameName).getOrElse(null)
 
       if (model == null) {
-        BadRequest
+        BadRequest("GameField not found!")
       } else {
         val node: JsValue = Json.obj(
           "game" -> gameFieldToJsonNode(gameName, model, request.session.get("player").getOrElse(""))
@@ -95,8 +98,8 @@ class Game extends Controller {
     request =>
       val sessionPlayer = request.session.get("player").getOrElse("")
 
-      val dropped: Boolean = if (gamesMap.contains(gameName)) {
-        val model: GameModel = gamesMap.get(gameName).get
+      val dropped: Boolean = if (Game.gamesMap.contains(gameName)) {
+        val model: GameModel = Game.gamesMap.get(gameName).get
         val hashcode = model.playerOnTurn.hashCode.toString
 
         model.started && sessionPlayer == hashcode && model.controller.dropCoin(column)
@@ -112,9 +115,9 @@ class Game extends Controller {
   }
 
   def undo(gameName: String) = {
-    if (gamesMap.contains(gameName)) {
+    if (Game.gamesMap.contains(gameName)) {
       val node = Json.obj("undone" -> true)
-      val model = gamesMap.get(gameName).get
+      val model = Game.gamesMap.get(gameName).get
 
       model.controller.undoLastMove
 
@@ -139,7 +142,7 @@ class Game extends Controller {
           (for {
             p <- rows
             player: JsValue = if (p != null) {
-              if (p eq gameModel.opponent) JsString("opponent")
+              if (p == gameModel.opponent.hashCode()) JsString("opponent")
               else JsString("you")
             }
             else {
