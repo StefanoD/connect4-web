@@ -7,7 +7,7 @@ import connectfour.model.Connect4Player
 class Application extends Controller {
 
   def index = Action {
-    Ok(views.html.index("Your new application is ready."))
+    Ok(views.html.index("Connect 4 Pl(us/ay)"))
   }
 
 }

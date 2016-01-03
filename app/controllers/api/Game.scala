@@ -62,6 +62,35 @@ class Game extends Controller {
 
       Ok(node).withSession(("player", model.player.hashCode.toString))
   }
+/*
+  def gameField(gameName: String): Result = Action(BodyParsers.parse.json) {
+    request =>
+      val model: GameModel = gamesMap.get(gameName).getOrElse {
+        return BadRequest
+      }
+
+      gamesMap.put(gameName, model)
+
+      val sessionPlayer = request.session.get("player").getOrElse("")
+      val playerOnTurn = model.playerOnTurn.hashCode.toString
+
+      val playerOnTurnJS: (String, JsValueWrapper) =
+        if (playerOnTurn == sessionPlayer) {
+          "playerOnTurn" -> "you"
+        } else {
+          "playerOnTurn" -> "opponent"
+        }
+
+      val node: JsValue = Json.obj(
+        "game" -> Json.obj("id" -> gameName,
+          "isWaitingForOpponent" -> model.waitingForOpponent,
+          "gameStarted" -> model.startGame,
+          playerOnTurnJS,
+          "game_field" -> JsArray())
+      )
+
+      Ok(node).withSession(("player", model.player.hashCode.toString))
+  }*/
 
   def dropCoin(gameName: String, column: Int) = Action {
     request =>
