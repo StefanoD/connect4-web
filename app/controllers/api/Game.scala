@@ -63,8 +63,7 @@ class Game extends Controller {
       Ok(node).withSession(("player", model.player.hashCode.toString))
   }
 
-  def gameFields: Action[JsValue] = Action(BodyParsers.parse.json) {
-    request =>
+  def gameFields = Action { request =>
       val sessionPlayer = request.session.get("player").getOrElse("")
       val gameFields = JsArray(
         (for {
@@ -78,7 +77,7 @@ class Game extends Controller {
       Ok(node)
   }
 
-  def gameField(gameName: String): Action[JsValue] = Action(BodyParsers.parse.json) {
+  def gameField(gameName: String) = Action {
     request =>
       val model: GameModel = gamesMap.get(gameName).getOrElse(null)
 
