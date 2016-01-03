@@ -62,35 +62,20 @@ class Game extends Controller {
 
       Ok(node).withSession(("player", model.player.hashCode.toString))
   }
-/*
-  def gameField(gameName: String): Result = Action(BodyParsers.parse.json) {
+
+  def gameField(gameName: String): Action[JsValue] = Action(BodyParsers.parse.json) {
     request =>
-      val model: GameModel = gamesMap.get(gameName).getOrElse {
-        return BadRequest
+      val model: GameModel = gamesMap.get(gameName).getOrElse(null)
+
+      if (model == null) {
+        BadRequest
+      } else {
+        val node: JsValue = Json.obj(
+          "game" -> gameFieldToJsonNode(gameName, model, request.session.get("player").getOrElse(""))
+        )
+        Ok(node)
       }
-
-      gamesMap.put(gameName, model)
-
-      val sessionPlayer = request.session.get("player").getOrElse("")
-      val playerOnTurn = model.playerOnTurn.hashCode.toString
-
-      val playerOnTurnJS: (String, JsValueWrapper) =
-        if (playerOnTurn == sessionPlayer) {
-          "playerOnTurn" -> "you"
-        } else {
-          "playerOnTurn" -> "opponent"
-        }
-
-      val node: JsValue = Json.obj(
-        "game" -> Json.obj("id" -> gameName,
-          "isWaitingForOpponent" -> model.waitingForOpponent,
-          "gameStarted" -> model.startGame,
-          playerOnTurnJS,
-          "game_field" -> JsArray())
-      )
-
-      Ok(node).withSession(("player", model.player.hashCode.toString))
-  }*/
+  }
 
   def dropCoin(gameName: String, column: Int) = Action {
     request =>
@@ -124,42 +109,39 @@ class Game extends Controller {
       BadRequest
     }
   }
-/*
-Evtl total unnötig, da wir kein Save und Load machen!
-  private def gameFieldToJsonNode(gameName: String, gameModel: GameModel) = Action {
-    request =>
 
-        val gameField: Array[Array[Player]] = gameModel.controller.getCopyOfGameField.gameField.reverse
-        val sessionPlayer = request.session.get("player").getOrElse("")
-        val playerOnTurn = if (gameModel.playerOnTurn.hashCode.toString == sessionPlayer)
-          "you"
-        else "opponent"
+  //Evtl total unnötig, da wir kein Save und Load machen!
+  private def gameFieldToJsonNode(gameName: String, gameModel: GameModel, sessionPlayer: String): JsValue = {
+    val gameField: Array[Array[Player]] = gameModel.controller.getCopyOfGameField.gameField.reverse
+    val playerOnTurn = if (gameModel.playerOnTurn.hashCode.toString == sessionPlayer)
+      "you"
+    else "opponent"
 
-        val gameArrayNode: Seq[JsArray] =
-          for {
-            rows: Array[Player] <- gameField
+    val gameArrayNode: Seq[JsArray] =
+      for {
+        rows: Array[Player] <- gameField
 
-            rowsNode: JsArray =
-            (for {
-              p <- rows
-              player: JsValueWrapper = if (p != null) {
-                if (p eq gameModel.opponent) "opponent"
-                else "you"
-              }
-              else {
-                JsNull
-              }
-            } yield player).toSeq
-          } yield rowsNode
+        rowsNode: JsArray = JsArray(
+          (for {
+            p <- rows
+            player: JsValue = if (p != null) {
+              if (p eq gameModel.opponent) JsString("opponent")
+              else JsString("you")
+            }
+            else {
+              JsNull
+            }
+          } yield player).toSeq)
+      } yield rowsNode
 
-      val node: JsValue = Json.obj(
-        "id" -> gameName,
-        "isWaitingForOpponent" -> gameModel.waitingForOpponent,
-        "gameStarted" -> gameModel.started,
-        "playerOnTurn" -> playerOnTurn,
-        "game_field" -> gameArrayNode
-      )
+    val node: JsValue = Json.obj(
+      "id" -> gameName,
+      "isWaitingForOpponent" -> gameModel.waitingForOpponent,
+      "gameStarted" -> gameModel.started,
+      "playerOnTurn" -> playerOnTurn,
+      "game_field" -> gameArrayNode
+    )
 
-        return node
-  }*/
+    node
+  }
 }

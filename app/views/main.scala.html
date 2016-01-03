@@ -73,43 +73,11 @@
             {{outlet}}
         </script>
 
-        <script type="text/x-handlebars" id="games/index">    
-            <div class="container">
-                <h2>Play against other player !!</h2>
-                <ul>
-                    {{#each gameIndexController="games"}}
-                    {{#if this.isPlayerVsPlayer }}
-                    {{#if this.isWaitingForOpponent}}
-                        <li>
-                            <button class ="btn" {{action joinGame this.id view }}>
-                            Join Game
-                            </button>
-                            {{this.id}}
-                        </li>
-                    {{/if}}
-                    {{/if}}
-                    {{else}}
-                    No Games available
-                    {{/each}}
-                </ul>
-            </div>
-
-        </script>
-
         <script type="text/x-handlebars" id="games/play">    
             {{#unless  this.isPlayerVsPlayer}}
             <div class="nav nav-list pull-right">
                 <button class ="btn" {{action undo view }}><i class="icon-arrow-left"></i>Undo</button>
                 <button class ="btn" {{action redo view }}>Redo <i class="icon-arrow-right"></i></button>
-                <form class="navbar-form" >
-                    {{input type="text" class="input-medium" value=saveGame placeholder="Enter Save/Load Name" size="50" }}
-                    <button class ="btn" {{action save saveGame view }}>
-                    Save
-                    </button>
-                    <button class ="btn" {{action load saveGame view}}>
-                    Load
-                    </button>
-                </form>
             </div>
             {{/unless}}
             {{#if this.isPlayerVsPlayer}}
