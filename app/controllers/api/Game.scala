@@ -25,12 +25,6 @@ object Game {
 }
 
 class Game extends Controller {
-  private val gameForm = Form(
-    mapping(
-      "id" -> optional(text)
-    )(GameData.apply)(GameData.unapply)
-  )
-
   def newGameWithoutName() = {
     newGameWithName(UUID.randomUUID.toString)
   }
