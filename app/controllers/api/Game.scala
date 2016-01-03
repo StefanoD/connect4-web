@@ -63,6 +63,21 @@ class Game extends Controller {
       Ok(node).withSession(("player", model.player.hashCode.toString))
   }
 
+  def gameFields: Action[JsValue] = Action(BodyParsers.parse.json) {
+    request =>
+      val sessionPlayer = request.session.get("player").getOrElse("")
+      val gameFields = JsArray(
+        (for {
+          (gameName, gameModel) <- gamesMap
+          gameFieldJs = gameFieldToJsonNode(gameName, gameModel, sessionPlayer)
+        } yield gameFieldJs).toSeq)
+
+      val node: JsValue = Json.obj(
+        "games" -> gameFields
+      )
+      Ok(node)
+  }
+
   def gameField(gameName: String): Action[JsValue] = Action(BodyParsers.parse.json) {
     request =>
       val model: GameModel = gamesMap.get(gameName).getOrElse(null)

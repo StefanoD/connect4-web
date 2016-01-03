@@ -9,7 +9,7 @@ GET         /        @controllers.Application.index()
 # Find One
 GET         /api/games/:gameName        @controllers.api.Game.gameField(gameName: String)
 # Find All
-#GET         /api/games        @controllers.api.Game.getGameFields()
+GET         /api/games        @controllers.api.Game.gameFields()
 # Create
 POST        /api/games        @controllers.api.Game.newGameWithoutName()
 

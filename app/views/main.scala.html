@@ -73,6 +73,29 @@
             {{outlet}}
         </script>
 
+        <script type="text/x-handlebars" id="games/index">    
+            <div class="container">
+                <h2>Play against other player !!</h2>
+                <ul>
+                    {{#each gameIndexController="games"}}
+                    {{#if this.isPlayerVsPlayer }}
+                    {{#if this.isWaitingForOpponent}}
+                        <li>
+                            <button class ="btn" {{action joinGame this.id view }}>
+                            Join Game
+                            </button>
+                            {{this.id}}
+                        </li>
+                    {{/if}}
+                    {{/if}}
+                    {{else}}
+                    No Games available
+                    {{/each}}
+                </ul>
+            </div>
+
+        </script>
+
         <script type="text/x-handlebars" id="games/play">    
             {{#unless  this.isPlayerVsPlayer}}
             <div class="nav nav-list pull-right">
