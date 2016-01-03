@@ -125,7 +125,7 @@ class Game extends Controller {
           (for {
             p <- rows
             player: JsValue = if (p != null) {
-              if (p eq gameModel.opponent) JsString("opponent")
+              if (p == gameModel.opponent) JsString("opponent")
               else JsString("you")
             }
             else {

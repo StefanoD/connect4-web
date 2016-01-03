@@ -7,7 +7,7 @@ GET         /        @controllers.Application.index()
 
 
 # Find One
-#GET         /api/games/:gameName        @controllers.api.Game.getGameField(gameName: String)
+GET         /api/games/:gameName        @controllers.api.Game.gameField(gameName: String)
 # Find All
 #GET         /api/games        @controllers.api.Game.getGameFields()
 # Create
