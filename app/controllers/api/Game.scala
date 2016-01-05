@@ -128,8 +128,7 @@ class Game extends Controller {
       BadRequest
     }
   }
-
-  //Evtl total unnötig, da wir kein Save und Load machen!
+  
   private def gameFieldToJsonNode(gameName: String, gameModel: GameModel, sessionPlayer: String): JsValue = {
     val gameField: Array[Array[Player]] = gameModel.controller.getCopyOfGameField.gameField.reverse
     val playerOnTurn = if (gameModel.playerOnTurn.hashCode.toString == sessionPlayer)
