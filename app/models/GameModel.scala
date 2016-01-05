@@ -15,6 +15,7 @@ class GameModel() {
   def startGame: Boolean = {
     if (!waitingForOpponent) {
       Connect4GameController.reset()
+      started = true
       return true
     }
     return false
