@@ -1,80 +1,63 @@
 package controllers.api
 
-import java.util.UUID
-
 import modelinterfaces.Player
 import models.GameModel
-import org.apache.commons.lang3.ArrayUtils
+import play.api.Logger
 import play.api.libs.json.Json.JsValueWrapper
+import play.api.libs.json._
 import play.api.mvc._
 
 import scala.collection.mutable
-
-import play.api._
-import play.api.i18n._
-import play.api.data.Form
-import play.api.data.Forms._
-import play.api.data.validation.Constraints._
-import play.api.libs.json._
-import models._
-import play.api.Logger
-
-case class GameData(id: Option[String])
 
 object Game {
   private val gamesMap = new mutable.HashMap[String, GameModel]()
 }
 
 class Game extends Controller {
-  def newGameWithoutName() = {
-    newGameWithName(UUID.randomUUID.toString)
-  }
 
-  def newGameWithName(gameName: String) = {
-    newGame(gameName, new GameModel)
-  }
+  def newGame() = Action(BodyParsers.parse.json) { request =>
+    val model = new GameModel
+    val gameName = (request.body \ "game" \ "id").get.toString()
 
-  def newGame(gameName: String, gameModel: GameModel) = Action(BodyParsers.parse.json) {
-    request =>
-      val model: GameModel = Game.gamesMap.get(gameName).getOrElse(gameModel)
+    Logger.debug("gameName: " + gameName)
 
-      Game.gamesMap.put(gameName, model)
+    Game.gamesMap.put(gameName, model)
 
-      val sessionPlayer = request.session.get("player").getOrElse("")
-      val playerOnTurn = model.playerOnTurn.hashCode.toString
+    val sessionPlayer = request.session.get("player").getOrElse("")
+    val playerOnTurn = model.playerOnTurn.hashCode.toString
 
-      val playerOnTurnJS: (String, JsValueWrapper) =
-        if (playerOnTurn == sessionPlayer) {
-          "playerOnTurn" -> "you"
-        } else {
-          "playerOnTurn" -> "opponent"
-        }
+    val playerOnTurnJS: (String, JsValueWrapper) =
+      if (playerOnTurn == sessionPlayer) {
+        "playerOnTurn" -> "you"
+      } else {
+        "playerOnTurn" -> "opponent"
+      }
 
-      val node: JsValue = Json.obj(
-        "game" -> Json.obj("id" -> gameName,
-          "isWaitingForOpponent" -> model.waitingForOpponent,
-          "gameStarted" -> model.startGame,
-          playerOnTurnJS,
-          "game_field" -> JsArray())
-      )
+    val node: JsValue = Json.obj(
+      "game" -> Json.obj("id" -> gameName,
+        "isWaitingForOpponent" -> model.waitingForOpponent,
+        "gameStarted" -> model.startGame,
+        playerOnTurnJS,
+        "game_field" -> JsArray())
+    )
 
-      Logger.debug("newGame()\nplayer: " + model.player.hashCode.toString + "\nopponent: " + model.opponent.hashCode.toString)
+    Logger.debug("newGame()\nplayer: " + model.player.hashCode.toString + "\nopponent: " + model.opponent.hashCode.toString)
 
-      Ok(node).withSession(("player", model.player.hashCode.toString))
+    Ok(node).withSession(("player", model.player.hashCode.toString))
   }
 
   def gameFields = Action { request =>
-      val sessionPlayer = request.session.get("player").getOrElse("")
-      val gameFields = JsArray(
-        (for {
-          (gameName, gameModel) <- Game.gamesMap
-          gameFieldJs = gameFieldToJsonNode(gameName, gameModel, sessionPlayer)
-        } yield gameFieldJs).toSeq)
+    val sessionPlayer = request.session.get("player").getOrElse("")
+    val gameFields = JsArray(
+      (for {
+        (gameName, gameModel) <- Game.gamesMap
+        gameFieldJs = gameFieldToJsonNode(gameName, gameModel, sessionPlayer)
+      } yield gameFieldJs).toSeq)
 
-      val node: JsValue = Json.obj(
-        "games" -> gameFields
-      )
-      Ok(node)
+    val node: JsValue = Json.obj(
+      "games" -> gameFields
+    )
+    Ok(node)
   }
 
   def gameField(gameName: String) = Action {

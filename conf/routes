@@ -11,7 +11,7 @@ GET         /api/games/:gameName        @controllers.api.Game.gameField(gameName
 # Find All
 GET         /api/games        @controllers.api.Game.gameFields()
 # Create
-POST        /api/games        @controllers.api.Game.newGameWithoutName()
+POST        /api/games        @controllers.api.Game.newGame()
 
 #GET        /api/games/:gameName/joinGame        @controllers.api.Game.joinGame(gameName: String)
 
