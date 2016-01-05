@@ -17,6 +17,7 @@ import play.api.data.Forms._
 import play.api.data.validation.Constraints._
 import play.api.libs.json._
 import models._
+import play.api.Logger
 
 case class GameData(id: Option[String])
 

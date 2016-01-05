@@ -7,7 +7,7 @@ import controller.GameController
 
 class GameModel() {
   val controller = Connect4GameController.getNewInstance("You", "Computer")
-  val player, opponent = controller.getPlayers
+  val (player, opponent) = controller.getPlayers
 
   var waitingForOpponent = false
   var started = false
