@@ -58,6 +58,8 @@ class Game extends Controller {
           "game_field" -> JsArray())
       )
 
+      Logger.debug("newGame()\nplayer: " + model.player.hashCode.toString + "\nopponent: " + model.opponent.hashCode.toString)
+
       Ok(node).withSession(("player", model.player.hashCode.toString))
   }
 
@@ -96,6 +98,11 @@ class Game extends Controller {
       val dropped: Boolean = if (Game.gamesMap.contains(gameName)) {
         val model: GameModel = Game.gamesMap.get(gameName).get
         val hashcode = model.playerOnTurn.hashCode.toString
+
+        Logger.debug("dropCoin(" + gameName + ", " + column + ")")
+        Logger.debug("GameStarted: " + model.started)
+        Logger.debug("sessionPlayer: " + sessionPlayer + "\nplayerOnTurn: " + hashcode)
+        Logger.debug("dropCoin() END")
 
         model.started && sessionPlayer == hashcode && model.controller.dropCoin(column)
       } else {
@@ -137,7 +144,7 @@ class Game extends Controller {
           (for {
             p <- rows
             player: JsValue = if (p != null) {
-              if (p == gameModel.opponent.hashCode()) JsString("opponent")
+              if (p.toString == gameModel.opponent.toString()) JsString("opponent")
               else JsString("you")
             }
             else {
