@@ -14,49 +14,6 @@
         <script type='text/javascript' src='@routes.Assets.at("javascripts/ember-data.js")'></script>
         <script type='text/javascript' src='@routes.Assets.at("javascripts/bootstrap.js")'></script>
 
-        <script type="text/javascript">
-
-            Handlebars.registerHelper("debug", function(optionalValue) {
-                console.log("Current Context");
-                console.log("====================");
-                console.log(this);
-
-                if (optionalValue) {
-                    console.log("Value");
-                    console.log("====================");
-                    console.log(optionalValue);
-                }
-            });
-
-
-            Handlebars.registerHelper('ifc', function (v1, operator, v2, options) {
-
-                switch (operator) {
-                    case '==':
-                        return (v1 == v2) ? options.fn(this) : options.inverse(this);
-                    case '===':
-                        return (v1 === v2) ? options.fn(this) : options.inverse(this);
-                    case '<':
-                        return (v1 < v2) ? options.fn(this) : options.inverse(this);
-                    case '<=':
-                        return (v1 <= v2) ? options.fn(this) : options.inverse(this);
-                    case '>':
-                        return (v1 > v2) ? options.fn(this) : options.inverse(this);
-                    case '>=':
-                        return (v1 >= v2) ? options.fn(this) : options.inverse(this);
-                    default:
-                        return options.inverse(this);
-                }
-            });
-        </script>
-
-        <script>
-            Ember.Handlebars.helper('object', function(value, options) {
-
-            });
-
-        </script>
-
         <script src='@routes.Assets.at("javascripts/main.js")'></script>
 
         <script type="text/x-handlebars">    
@@ -131,5 +88,89 @@
     </head>
     <body>
     @content
+        <div class="navbar navbar-static-top">      
+            <div class="navbar-inner">
+                        <a class="brand" href="#">Connectfour Plus</a>        
+                <form class="navbar-form pull-left">
+                    <input id = "gameName" type="text" placeholder="Enter Game Name" size="50" >
+                    <button id = "new" class="btn">New</button>
+                </form>
+
+            </div>    
+        </div>
+
+        <div class="nav nav-list pull-right">
+            <button class ="btn"><i class="icon-arrow-left"></i>Undo</button>
+            <button class ="btn">Redo <i class="icon-arrow-right"></i></button>
+        </div>
+
+        <div class="container">
+            <div class="row-fluid">
+                <button id = "0" class="btn drop span1 offset2">Drop</button>
+                <button id = "1" class="btn drop span1 ">Drop</button>
+                <button id = "2" class="btn drop span1 ">Drop</button>
+                <button id = "3" class="btn drop span1 ">Drop</button>
+                <button id = "4" class="btn drop span1 ">Drop</button>
+                <button id = "5" class="btn drop span1 ">Drop</button>
+                <button id = "6" class="btn drop span1 ">Drop</button>
+            </div>
+            {{#each game_field}}
+            <div class="row-fluid gamefield">
+                <span class="span1 offset1"></span>
+                {{#each this}}
+                <span class="span1 {{this}} gametoken "></span>
+                {{/each}}
+
+            </div>
+            {{/each}}
+        </div>
     </body>
+
+
+    <script type="text/javascript">
+
+        $( "#new" ).click(function() {
+            gameID = $( "#gameName" ).val();
+            var game = {
+                 'game': {'id': gameID }
+            };
+
+            var gameJson = JSON.stringify(game);
+
+            $.ajax({
+                url: '/api/games',
+                type: 'post',
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                data: gameJson,
+                failure: function(errMsg) {
+                    alert(errMsg);
+                }
+            });
+        });
+
+        $( ".drop" ).click(function() {
+            var column = $(this).attr('id');
+
+            alert(gameID);
+
+            var dropAPI =      "/api/games/" + gameID + "/dropcoin/" + column;
+            var gameFieldAPI = "/api/games/" + gameID;
+
+            $.getJSON( dropAPI )
+            .done(function() {
+
+              $.getJSON( gameFieldAPI )
+                .done(function( data ) {
+                  $.each( data.game.game_field, function( i, row ) {
+                    $.each( row, function( j, cell ) {
+                        console.log( "cell(" + i + "," + j + ")" + cell);
+                    });
+                  });
+                });
+
+            });
+        });
+   </script>
+
 </html>

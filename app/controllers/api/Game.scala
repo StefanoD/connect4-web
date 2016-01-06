@@ -17,11 +17,11 @@ class Game extends Controller {
 
   def newGame() = Action(BodyParsers.parse.json) { request =>
     val model = new GameModel
-    val gameName = (request.body \ "game" \ "id").get.toString()
+    val gameName: String = (request.body \ "game" \ "id").get.as[String]
 
     Logger.debug("gameName: " + gameName)
 
-    Game.gamesMap.put(gameName, model)
+    Game.gamesMap.put(gameName.trim, model)
 
     val sessionPlayer = request.session.get("player").getOrElse("")
     val playerOnTurn = model.playerOnTurn.hashCode.toString
@@ -60,43 +60,50 @@ class Game extends Controller {
     Ok(node)
   }
 
-  def gameField(gameName: String) = Action {
-    request =>
-      val model: GameModel = Game.gamesMap.get(gameName).getOrElse(null)
+  def gameField(gameName: String) = Action { request =>
+    Logger.debug("dropCoin(" + gameName + ") called")
 
-      if (model == null) {
-        BadRequest("GameField not found!")
-      } else {
-        val node: JsValue = Json.obj(
-          "game" -> gameFieldToJsonNode(gameName, model, request.session.get("player").getOrElse(""))
-        )
-        Ok(node)
-      }
+    val model: GameModel = Game.gamesMap.get(gameName).getOrElse(null)
+
+    if (model == null) {
+      BadRequest("GameField not found!")
+    } else {
+      val node: JsValue = Json.obj(
+        "game" -> gameFieldToJsonNode(gameName, model, request.session.get("player").getOrElse(""))
+      )
+      Ok(node)
+    }
   }
 
-  def dropCoin(gameName: String, column: Int) = Action {
-    request =>
-      val sessionPlayer = request.session.get("player").getOrElse("")
+  def dropCoin(gameName: String, column: Int) = Action { request =>
+    val sessionPlayer = request.session.get("player").getOrElse("")
 
-      val dropped: Boolean = if (Game.gamesMap.contains(gameName)) {
-        val model: GameModel = Game.gamesMap.get(gameName).get
-        val hashcode = model.playerOnTurn.hashCode.toString
+    Logger.debug("dropCoin(" + gameName + ", " + column + ") called")
 
-        Logger.debug("dropCoin(" + gameName + ", " + column + ")")
-        Logger.debug("GameStarted: " + model.started)
-        Logger.debug("sessionPlayer: " + sessionPlayer + "\nplayerOnTurn: " + hashcode)
-        Logger.debug("dropCoin() END")
+    Game.gamesMap.foreach { case (id, model) => Logger.debug("id: " + id + " equals \"" + gameName + "\": " + ((gameName.trim) == (id.trim))) }
 
-        model.started && sessionPlayer == hashcode && model.controller.dropCoin(column)
-      } else {
-        false
-      }
+    val dropped: Boolean = if (Game.gamesMap.contains(gameName.trim)) {
+      val model: GameModel = Game.gamesMap.get(gameName).get
+      val hashcode = model.playerOnTurn.hashCode.toString
 
-      val node: JsValue = Json.obj(
-        "dropped" -> dropped
-      )
+      Logger.debug("GameStarted: " + model.started)
+      Logger.debug("sessionPlayer: " + sessionPlayer + "\nplayerOnTurn: " + hashcode)
+      Logger.debug("dropCoin() END")
 
-      Ok(node)
+      model.started && sessionPlayer == hashcode && model.controller.dropCoin(column)
+      true
+    } else {
+      Logger.error("dropCoin(): " + gameName + " not found!")
+      false
+    }
+
+    val node: JsValue = Json.obj(
+      "dropped" -> dropped
+    )
+
+    Logger.debug("dropCoin() END")
+
+    Ok(node)
   }
 
   def undo(gameName: String) = {
