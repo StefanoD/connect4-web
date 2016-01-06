@@ -120,7 +120,7 @@ class Game extends Controller {
   }
 
   private def gameFieldToJsonNode(gameName: String, gameModel: GameModel, sessionPlayer: String): JsValue = {
-    val gameField: Array[Array[Player]] = gameModel.controller.getCopyOfGameField.gameField.reverse
+    val gameField: Array[Array[Player]] = gameModel.controller.getCopyOfGameField.gameField
     val playerOnTurn = if (gameModel.playerOnTurn.hashCode.toString == sessionPlayer)
       "you"
     else "opponent"
