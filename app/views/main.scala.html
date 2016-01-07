@@ -156,6 +156,9 @@
                 data: gameJson,
                 failure: function(errMsg) {
                     alert(errMsg);
+                },
+                success: function(data) {
+                    window.setInterval(getGameField, 1000);
                 }
             });
         });
@@ -163,7 +166,7 @@
         $( ".drop" ).click(function() {
             var column = $(this).attr('id');
 
-            var dropAPI =      "/api/games/" + gameID + "/dropcoin/" + column;
+            var dropAPI = "/api/games/" + gameID + "/dropcoin/" + column;
 
 
             $.getJSON( dropAPI )
