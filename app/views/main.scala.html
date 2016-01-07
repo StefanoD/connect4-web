@@ -51,6 +51,8 @@
         </div>
 
         <div class="container">
+            <div id="status" class="row-fluid"></div>
+
             <div class="row-fluid">
                 <button id = "0" class="btn drop span1 offset2">Drop</button>
                 <button id = "1" class="btn drop span1 ">Drop</button>
@@ -168,7 +170,6 @@
 
             var dropAPI = "/api/games/" + gameID + "/dropcoin/" + column;
 
-
             $.getJSON( dropAPI )
             .done(function() {
 
@@ -183,6 +184,14 @@
             $.getJSON( gameFieldAPI )
                 .done(function( data ) {
                   var colNumber = 0;
+
+                  if (data.game.winner.length > 0) {
+                    if (data.game.winner == "Computer") {
+                        $( "#status" ).text( "Computer has won!");
+                    } else {
+                        $( "#status" ).text( "You have won!");
+                    }
+                  }
 
                   $.each( data.game.game_field, function( i, row ) {
                     $.each( row, function( j, cell ) {

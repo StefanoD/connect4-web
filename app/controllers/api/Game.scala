@@ -147,7 +147,8 @@ class Game extends Controller {
       "isWaitingForOpponent" -> gameModel.waitingForOpponent,
       "gameStarted" -> gameModel.started,
       "playerOnTurn" -> playerOnTurn,
-      "game_field" -> gameArrayNode
+      "game_field" -> gameArrayNode,
+      "winner" -> gameModel.controller.getWinner
     )
 
     node
