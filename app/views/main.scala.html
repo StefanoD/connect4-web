@@ -164,12 +164,20 @@
             var column = $(this).attr('id');
 
             var dropAPI =      "/api/games/" + gameID + "/dropcoin/" + column;
-            var gameFieldAPI = "/api/games/" + gameID;
+
 
             $.getJSON( dropAPI )
             .done(function() {
 
-              $.getJSON( gameFieldAPI )
+              getGameField();
+
+            });
+        });
+
+        function getGameField() {
+            var gameFieldAPI = "/api/games/" + gameID;
+
+            $.getJSON( gameFieldAPI )
                 .done(function( data ) {
                   var colNumber = 0;
 
@@ -212,9 +220,7 @@
                     });
                   });
                 });
-
-            });
-        });
+        }
    </script>
 
 </html>
