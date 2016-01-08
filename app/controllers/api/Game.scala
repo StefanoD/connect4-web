@@ -61,7 +61,7 @@ class Game extends Controller {
   }
 
   def gameField(gameName: String) = Action { request =>
-    Logger.debug("dropCoin(" + gameName + ") called")
+    Logger.debug("gameField(" + gameName + ") called")
 
     val model: GameModel = Game.gamesMap.get(gameName).getOrElse(null)
 
@@ -106,7 +106,7 @@ class Game extends Controller {
     Ok(node)
   }
 
-  def undo(gameName: String) = {
+  def undo(gameName: String) = Action {
     if (Game.gamesMap.contains(gameName)) {
       val node = Json.obj("undone" -> true)
       val model = Game.gamesMap.get(gameName).get

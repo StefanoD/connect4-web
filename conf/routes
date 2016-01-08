@@ -22,7 +22,7 @@ GET         /api/games/:gameName/dropcoin/:column        @controllers.api.Game.d
 
 # Undo Redo
 
-#GET         /api/games/:gameName/undo        @controllers.api.Game.undo(gameName:String)
+GET         /api/games/:gameName/undo        @controllers.api.Game.undo(gameName:String)
 #GET         /api/games/:gameName/redo        @controllers.api.Game.redo(gameName:String)
 
 # save game
