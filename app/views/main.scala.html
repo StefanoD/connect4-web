@@ -16,21 +16,6 @@
 
         <script src='@routes.Assets.at("javascripts/main.js")'></script>
 
-        <script type="text/x-handlebars">    
-            <div class="navbar navbar-static-top">      
-                <div class="navbar-inner">
-                    <a class="brand" href="#">Connectfour Plus</a>        
-                    <form class="navbar-form pull-left">
-                        {{input type="text" value=gameName placeholder="Enter Game Name" size="50" }}
-                        <span>Play agains other Player {{input type="checkbox" name=pvp value=pvp checked=pvp}}</span>
-                        <button class="btn" {{action newGame gameName pvp}}>New</button>
-                    </form>
-
-                </div>    
-            </div>
-            {{outlet}}
-        </script>
-
     </head>
     <body>
     @content
@@ -143,6 +128,8 @@
     <script type="text/javascript">
 
         $( "#new" ).click(function() {
+            $( "#status" ).text( "");
+
             gameID = $( "#gameName" ).val();
             var game = {
                  'game': {'id': gameID }
